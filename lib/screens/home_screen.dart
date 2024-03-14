@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:serious_budget_app/data/repos/authentication_repository.dart';
+import 'package:serious_budget_app/screens/expense_feed_screen.dart';
 import 'package:serious_budget_app/screens/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -14,12 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
-    Center(child: Column(
-      children:const [
-        SizedBox(height:200),
-        Text("Asdfgsdfgsdfgsdfgsdfgdfg")
-  ]
-      )),
+    const ExpenseFeedScreen(),
     const Text("B"),
     const Text("C"),
     const Text("D"),
@@ -50,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildBottomTab() {
-    return Container(
+    return SizedBox(
       height: 60,
       child: BottomAppBar(
         color: Colors.black, //Color.fromRGBO(243, 175, 77, 1),//Colors.black,
