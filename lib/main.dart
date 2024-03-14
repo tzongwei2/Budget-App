@@ -7,7 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:serious_budget_app/screens/home_screen.dart';
 import 'package:serious_budget_app/screens/login_screen.dart';
 import 'blocs/authentication/auth_bloc.dart';
+import 'blocs/expenses/expenses_bloc.dart';
 import 'data/repos/authentication_repository.dart';
+import 'data/repos/expenses_repository.dart';
 
 
 void main() async {
@@ -35,15 +37,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepositoryProvider(
-      create: (context) => AuthRepository(),
-      child: BlocProvider(
-        create: (context) => AuthBloc(
-          authRepository: RepositoryProvider.of<AuthRepository>(context),
-        ),
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (context) => AuthRepository()),
+        RepositoryProvider(create: (context) => ExpenseRepository()),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthBloc>(
+            create: (context) => AuthBloc(authRepository: RepositoryProvider.of<AuthRepository>(context)),
+          ),
+          BlocProvider<ExpenseBloc>(
+            create: (context) => ExpenseBloc(expenseRepository: RepositoryProvider.of<ExpenseRepository>(context)),
+          ),
+        ],
         child: MaterialApp(
-          home: initialUser != null ? HomeScreen(user: initialUser!) : const LoginScreen(),
-        ),
+      home: initialUser != null ? HomeScreen(user: initialUser!) : const LoginScreen(),
+    ),
       ),
     );
   }
