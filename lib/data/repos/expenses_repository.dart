@@ -12,7 +12,7 @@ class ExpenseRepository{
 
     List<Expense> expenses = documents.map((doc) => Expense(
       id: doc['_id'].toString(),
-      expense: doc['expense'] as double,
+      expense: double.parse(doc['expense'].toStringAsFixed(3)),
       category: doc['category'].toString(),
       user: doc['user'].toString(),
       date: doc['date'] as DateTime,

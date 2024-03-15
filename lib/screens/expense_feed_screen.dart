@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
+import '../blocs/authentication/auth_bloc.dart';
 import '../blocs/expenses/expenses_bloc.dart';
 import '../data/models/expense_model.dart';
 
@@ -38,7 +40,7 @@ class _ExpenseFeedScreenState extends State<ExpenseFeedScreen> {
               InkWell(
                   child: Icon(Icons.arrow_left, color: Colors.black, size: 35)),
               Text(
-                "Feb",
+                '${DateFormat('MMM yy').format(DateTime.now())}',
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w700,
@@ -50,7 +52,7 @@ class _ExpenseFeedScreenState extends State<ExpenseFeedScreen> {
                       Icon(Icons.arrow_right, color: Colors.black, size: 35)),
               const Spacer(),
               Text(
-                '\$${state.totalExpenses.toString()}',
+                '\$${state.totalExpenses.toStringAsFixed(2)}',
                 style: const TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.w700,
@@ -59,25 +61,73 @@ class _ExpenseFeedScreenState extends State<ExpenseFeedScreen> {
               )
             ])),
       ),
-      Divider(),
+         const  Divider(
+           height: 1,
+           thickness: 0.5,
+           color: Colors.grey,
+         ),
       Expanded(
         child: ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: state.expenses.length,
+            padding: const EdgeInsets.all(6),
+            itemCount: state.groupedExpensesByDay.length,
             itemBuilder: (context, index) {
-              Expense expense = state.expenses[index];
-              return _buildExpenseItem(expense: expense);
-            }),
+              DateTime day = state.groupedExpensesByDay.keys.elementAt(index);
+              List<Expense> expenses = state.groupedExpensesByDay[day]!;
+            return _buildDayCard(day: day, expenses: expenses);
+            },
       ),
-    ]);}
+      )]);}
         else {
-          return Center(child: Text('Unknown state'));
+          return const Center(child: Text('Unknown state'));
         }}));}
   }
 
+Widget _buildDayCard({required DateTime day, required List<Expense> expenses}) {
+  final totalDayExpenses = expenses.fold<double>(
+    0, (sum, expense) => sum + expense.expense);
+  return Card(
+    color: totalDayExpenses > 160? Colors.red.shade200.withOpacity(0.5) : Colors.white,
+    elevation: 3,
+    margin: const EdgeInsets.all(6),
+    child: Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8,8,8,16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Text(
+                '${day.year}-${day.month}-${day.day}',
+                style: const TextStyle(fontWeight: FontWeight.normal),
+              ),
+              Row(children: [Text('${DateFormat('EEE').format(day)}: ',
+                  style: TextStyle(color : totalDayExpenses > 100? Colors.red.shade900 : Colors.black)),
+                Text('\$${totalDayExpenses.toStringAsFixed(2)}',
+              style: TextStyle(color : totalDayExpenses > 100? Colors.red.shade900 : Colors.black, fontWeight: FontWeight.bold),) ])]
+            ),
+          ),
+          ListView.builder(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: expenses.length,
+            itemBuilder: (context, index) {
+              Expense expense = expenses[index];
+              return _buildExpenseItem(expense: expense);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
   Widget _buildExpenseItem({required Expense expense}) {
-    return Card(
-      child: Padding(
+    return
+      Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 12, 12),
           child: InkWell(
               onTap: () {
@@ -87,14 +137,16 @@ class _ExpenseFeedScreenState extends State<ExpenseFeedScreen> {
                 Row(children: [
                   Container(
                     padding: const EdgeInsets.all(1), // Border width
-                    decoration: const BoxDecoration(
-                      color: Colors.pink,
+                    decoration:  BoxDecoration(
+                      color:  expense.user == 'WG Zi Yi'? Colors.pink: Colors.blue,
                       shape: BoxShape.circle,
                     ),
-                    child: const CircleAvatar(
-                      backgroundImage: AssetImage('assets/zy.jpeg'),
+                    child:
+
+                       CircleAvatar(
+                      backgroundImage: expense.user == 'WG Zi Yi'? const AssetImage('assets/zy.jpeg') : const AssetImage('assets/zw.jpeg'),
                       radius: 22,
-                    ),
+                    )
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 12),
@@ -102,12 +154,17 @@ class _ExpenseFeedScreenState extends State<ExpenseFeedScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(children:  [
-                            Text(expense.category),
+                            Text(expense.category,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+
+                              ),
+                            ),
                             const SizedBox(width:8),
                             const Icon(Icons.sports_esports,
                                 size: 20, color: Colors.blue)
                           ]),
-                          const SizedBox(height:10),
+                          const SizedBox(height:6),
                           ConstrainedBox(
                               constraints: const BoxConstraints(
                                 maxWidth:
@@ -119,10 +176,14 @@ class _ExpenseFeedScreenState extends State<ExpenseFeedScreen> {
                         ]),
                   ),
                   const Spacer(),
-                  Text('\$${expense.expense.toString()}')
+                  Text('\$${expense.expense.toStringAsFixed(2)}')
                 ]),
-                const Divider()
-              ]))),
-    );
+                const SizedBox(height:5),
+                const  Divider(
+                  height: 1,
+                  thickness: 0.6,
+                  color: Colors.grey,
+                ),
+              ])));
   }
 

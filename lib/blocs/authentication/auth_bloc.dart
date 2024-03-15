@@ -12,7 +12,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  AuthBloc({required this.authRepository}) : super(UnAuthenticated()) {
+  AuthBloc({required this.authRepository, initialUser})
+      : super(initialUser != null ? Authenticated(user: initialUser) : UnAuthenticated()) {
     on<LogInRequested>((event, emit) async {
       emit(Loading());
       try {

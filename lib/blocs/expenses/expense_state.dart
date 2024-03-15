@@ -23,11 +23,11 @@ class ExpenseError extends ExpenseState {
 
 
 class ExpenseLoaded extends ExpenseState {
-  final List<Expense> expenses;
+  final  Map<DateTime, List<Expense>> groupedExpensesByDay;
   final double totalExpenses;
 
-  ExpenseLoaded(this.expenses, this.totalExpenses);
+  ExpenseLoaded(this.groupedExpensesByDay, this.totalExpenses);
 
   @override
-  List<Object?> get props => [expenses,totalExpenses];
+  List<Object?> get props => [groupedExpensesByDay,totalExpenses];
 }

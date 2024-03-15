@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(initialUser);
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (context) => AuthRepository()),
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider<AuthBloc>(
-            create: (context) => AuthBloc(authRepository: RepositoryProvider.of<AuthRepository>(context)),
+            create: (context) => AuthBloc(authRepository: RepositoryProvider.of<AuthRepository>(context),initialUser: initialUser),
           ),
           BlocProvider<ExpenseBloc>(
             create: (context) => ExpenseBloc(expenseRepository: RepositoryProvider.of<ExpenseRepository>(context)),
